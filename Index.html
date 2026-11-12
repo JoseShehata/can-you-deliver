@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Can You Deliver?</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #070d17;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .game {
+      max-width: 900px;
+      margin: auto;
+      padding: 50px 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ---------- INTRO ---------- */
+
+    .intro {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      color: #00aef3;
+      font-weight: bold;
+      letter-spacing: 2px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(54px, 10vw, 100px);
+      line-height: 0.95;
+      margin: 0 0 30px;
+      max-width: 800px;
+    }
+
+    h2 {
+      font-size: 36px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+    }
+
+    .lead {
+      font-size: 21px;
+      color: #b9c3d0;
+      line-height: 1.6;
+      max-width: 650px;
+    }
+
+    .mission {
+      font-size: 27px;
+      margin: 35px 0;
+      font-weight: bold;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .primary-button {
+      background: #00aef3;
+      border: none;
+      color: #03111e;
+      font-weight: bold;
+      padding: 17px 26px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .primary-button:hover {
+      background: #35c3f7;
+    }
+
+    /* ---------- GAME ---------- */
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #243244;
+      padding-bottom: 20px;
+      margin-bottom: 55px;
+      color: #8fa0b4;
+      font-size: 14px;
+    }
+
+    .day {
+      color: #00aef3;
+      letter-spacing: 2px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .scenario {
+      font-size: 21px;
+      line-height: 1.6;
+      color: #c8d1dc;
+      max-width: 720px;
+      margin-bottom: 35px;
+    }
+
+    .choice {
+      width: 100%;
+      background: #111c2a;
+      border: 1px solid #25364a;
+      color: white;
+      text-align: left;
+      padding: 22px;
+      margin: 9px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .choice:hover {
+      border-color: #00aef3;
+      transform: translateX(5px);
+    }
+
+    .choice-letter {
+      color: #00aef3;
+      font-weight: bold;
+      display: inline-block;
+      margin-right: 15px;
+    }
+
+    /* ---------- CONSEQUENCE ---------- */
+
+    .outcome {
+      margin-top: 35px;
+      background: #111c2a;
+      padding: 28px;
+      border-left: 4px solid #00aef3;
+    }
+
+    .outcome h3 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+
+    .outcome-text {
+      color: #c8d1dc;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .changes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    .change {
+      background: #08121e;
+      padding: 13px;
+      text-align: center;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .up {
+      color: #5ee29b;
+    }
+
+    .down {
+      color: #ff7272;
+    }
+
+    /* ---------- SCORE ---------- */
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 45px;
+    }
+
+    .score {
+      background: #0d1724;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .score-name {
+      font-size: 11px;
+      color: #8796a8;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+
+    .score-number {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    /* ---------- RESULT ---------- */
+
+    #resultScreen {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .result-title {
+      font-size: clamp(45px, 8vw, 82px);
+      margin: 10px 0 25px;
+    }
+
+    .result-copy {
+      font-size: 21px;
+      line-height: 1.6;
+      color: #c8d1dc;
+      max-width: 660px;
+    }
+
+    @media (max-width: 650px) {
+      .scoreboard,
+      .changes {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .game {
+        padding: 30px 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="game">
+
+    <!-- INTRO SCREEN -->
+
+    <section id="intro" class="intro">
+
+      <div class="eyebrow">FIELD OPERATIONS SIMULATION</div>
+
+      <h1>CAN YOU DELIVER?</h1>
+
+      <p class="lead">
+        A humanitarian emergency is unfolding.
+        Food has arrived in the country.
+        Getting it to the people who need it is now your responsibility.
+      </p>
+
+      <div class="mission">
+        500,000 people.<br>
+        30 days.<br>
+        You run the logistics operation.
+      </div>
+
+      <button class="primary-button" onclick="startGame()">
+        START THE OPERATION →
+      </button>
+
+    </section>
+
+
+    <!-- GAME SCREEN -->
+
+    <section id="gameScreen" class="hidden">
+
+      <div class="top">
+        <span>CAN YOU DELIVER?</span>
+        <span id="progress">DECISION 1 / 10</span>
+      </div>
+
+      <div class="day" id="day"></div>
+
+      <h2 id="questionTitle"></h2>
+
+      <p class="scenario" id="scenario"></p>
+
+      <div id="choices"></div>
+
+      <div id="outcome" class="outcome hidden">
+
+        <h3 id="outcomeTitle"></h3>
+
+        <p class="outcome-text" id="outcomeText"></p>
+
+        <div class="changes" id="changes"></div>
+
+        <button class="primary-button" onclick="nextQuestion()">
+          CONTINUE →
+        </button>
+
+      </div>
+
+
+      <div class="scoreboard">
+
+        <div class="score">
+          <div class="score-name">❤️ People Reached</div>
+          <div class="score-number" id="peopleScore">50</div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">⚡ Speed</div>
+          <div class="score-number" id="speedScore">50</div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">💰 Cost Efficiency</div>
+          <div class="score-number" id="costScore">50</div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">🛡️ Resilience</div>
+          <div class="score-number" id="riskScore">50</div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESULT SCREEN -->
+
+    <section id="resultScreen" class="hidden">
+
+      <div class="eyebrow">MISSION COMPLETE</div>
+
+      <div>YOUR LOGISTICS PROFILE</div>
+
+      <h1 class="result-title" id="resultTitle"></h1>
+
+      <p class="result-copy" id="resultText"></p>
+
+      <div class="scoreboard">
+
+        <div class="score">
+          <div class="score-name">❤️ People Reached</div>
+          <div class="score-number" id="finalPeople"></div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">⚡ Speed</div>
+          <div class="score-number" id="finalSpeed"></div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">💰 Cost Efficiency</div>
+          <div class="score-number" id="finalCost"></div>
+        </div>
+
+        <div class="score">
+          <div class="score-name">🛡️ Resilience</div>
+          <div class="score-number" id="finalRisk"></div>
+        </div>
+
+      </div>
+
+      <br><br>
+
+      <button class="primary-button" onclick="restartGame()">
+        PLAY AGAIN
+      </button>
+
+    </section>
+
+  </main>
+
+
+<script>
+
+let currentQuestion = 0;
+
+let scores = {
+  people: 50,
+  speed: 50,
+  cost: 50,
+  risk: 50
+};
+
+
+const questions = [
+
+{
+  day: "DAY 1",
+  title: "THE PORT",
+  scenario:
+    "2,000 MT of food has arrived, but the port is congested. Your contracted transporter cannot provide enough trucks for another five days. What do you do?",
+
+  choices: [
+
+    {
+      text: "WAIT FOR YOUR CONTRACTED FLEET",
+      outcome:
+        "You protect the transport budget, but valuable days are lost while cargo remains at the port.",
+      people: -5,
+      speed: -12,
+      cost: 10,
+      risk: 4
+    },
+
+    {
+      text: "HIRE LOCAL TRUCKS IMMEDIATELY",
+      outcome:
+        "Cargo begins moving quickly, but emergency transport capacity comes at a significant premium.",
+      people: 8,
+      speed: 12,
+      cost: -10,
+      risk: -3
+    },
+
+    {
+      text: "SPLIT THE SHIPMENT",
+      outcome:
+        "Priority cargo moves immediately while the remaining food waits for contracted capacity. You balance urgency and cost.",
+      people: 7,
+      speed: 6,
+      cost: -4,
+      risk: 6
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 4",
+  title: "THE ROAD IS GONE",
+  scenario:
+    "Heavy rain has washed out the primary road. Forty trucks carrying 800 MT of food are waiting. Engineers estimate the road will reopen in 12 days.",
+
+  choices: [
+
+    {
+      text: "WAIT FOR THE ROAD TO REOPEN",
+      outcome:
+        "The cargo stays safe and transport costs remain controlled, but communities wait almost two weeks longer.",
+      people: -10,
+      speed: -15,
+      cost: 8,
+      risk: 5
+    },
+
+    {
+      text: "REROUTE THE CONVOY",
+      outcome:
+        "The convoy takes a 420 km alternative route. Food keeps moving, but transport costs rise considerably.",
+      people: 7,
+      speed: 7,
+      cost: -12,
+      risk: -5
+    },
+
+    {
+      text: "GO MULTIMODAL",
+      outcome:
+        "Priority cargo is transferred to river transport. The operation becomes more complex, but urgent food moves.",
+      people: 10,
+      speed: 10,
+      cost: -7,
+      risk: 1
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 7",
+  title: "SECURITY ALERT",
+  scenario:
+    "Security reports indicate increased incidents along your main corridor. No incident has affected your movements yet. Your convoy is scheduled to leave tomorrow.",
+
+  choices: [
+
+    {
+      text: "PROCEED AS PLANNED",
+      outcome:
+        "The convoy leaves on schedule, but you accept significantly greater exposure to security risks.",
+      people: 8,
+      speed: 10,
+      cost: 4,
+      risk: -15
+    },
+
+    {
+      text: "SUSPEND THE MOVEMENT",
+      outcome:
+        "You reduce exposure to the immediate threat, but deliveries stop and the pipeline begins to slow.",
+      people: -10,
+      speed: -10,
+      cost: -4,
+      risk: 15
+    },
+
+    {
+      text: "ADAPT THE MOVEMENT",
+      outcome:
+        "You change timing, reduce convoy size and coordinate additional mitigation measures.",
+      people: 4,
+      speed: -2,
+      cost: -5,
+      risk: 9
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 10",
+  title: "NO MORE SPACE",
+  scenario:
+    "Your main warehouse is at 92% capacity. Another large shipment is arriving in four days.",
+
+  choices: [
+
+    {
+      text: "LEASE ADDITIONAL STORAGE",
+      outcome:
+        "Additional capacity protects the pipeline, but it increases operating costs.",
+      people: 4,
+      speed: 6,
+      cost: -12,
+      risk: 10
+    },
+
+    {
+      text: "INCREASE DISPATCHES",
+      outcome:
+        "Stock moves rapidly out of the warehouse, creating space while putting more pressure on transport.",
+      people: 8,
+      speed: 12,
+      cost: -5,
+      risk: -7
+    },
+
+    {
+      text: "DELAY INBOUND SHIPMENTS",
+      outcome:
+        "Warehouse pressure decreases, but the upstream pipeline begins backing up.",
+      people: -6,
+      speed: -8,
+      cost: 7,
+      risk: 5
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 13",
+  title: "THE ROAD ENDS HERE",
+  scenario:
+    "Your trucks reach the final logistics hub, but 45,000 people live beyond roads accessible by conventional trucks.",
+
+  choices: [
+
+    {
+      text: "ESTABLISH A DISTRIBUTION POINT HERE",
+      outcome:
+        "The operation remains simple and inexpensive, but vulnerable households must travel further to collect assistance.",
+      people: -8,
+      speed: 8,
+      cost: 10,
+      risk: -5
+    },
+
+    {
+      text: "CONTRACT LOCAL TRANSPORTERS",
+      outcome:
+        "Smaller locally available vehicles extend the operation further into affected communities.",
+      people: 12,
+      speed: 6,
+      cost: -6,
+      risk: -4
+    },
+
+    {
+      text: "BUILD A MULTIMODAL PLAN",
+      outcome:
+        "You combine local vehicles, boats and temporary storage to push assistance closer to isolated communities.",
+      people: 15,
+      speed: -3,
+      cost: -10,
+      risk: 8
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 16",
+  title: "THE FORECAST",
+  scenario:
+    "Your plan assumes 400,000 people will require assistance next month. New field information suggests the number may rise to 520,000, but it is not yet confirmed.",
+
+  choices: [
+
+    {
+      text: "WAIT FOR CONFIRMATION",
+      outcome:
+        "You avoid committing resources against uncertain figures, but lose valuable preparation time.",
+      people: -8,
+      speed: -8,
+      cost: 8,
+      risk: -5
+    },
+
+    {
+      text: "PLAN FOR 520,000 NOW",
+      outcome:
+        "You move aggressively against the higher forecast, increasing readiness but committing significant resources.",
+      people: 12,
+      speed: 10,
+      cost: -12,
+      risk: -3
+    },
+
+    {
+      text: "PREPOSITION PART OF THE REQUIREMENT",
+      outcome:
+        "You increase stocks in strategic locations while continuing to monitor demand.",
+      people: 9,
+      speed: 7,
+      cost: -5,
+      risk: 10
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 19",
+  title: "THE CHEAPEST BID",
+  scenario:
+    "You need more transport capacity. One company is 25% cheaper than the others, but has limited experience operating in difficult terrain.",
+
+  choices: [
+
+    {
+      text: "SELECT THE CHEAPEST BID",
+      outcome:
+        "You achieve major savings, but weaker operational performance creates reliability problems.",
+      people: -3,
+      speed: -5,
+      cost: 15,
+      risk: -12
+    },
+
+    {
+      text: "SELECT THE PROVEN OPERATOR",
+      outcome:
+        "The experienced transporter performs reliably, but costs significantly more.",
+      people: 6,
+      speed: 7,
+      cost: -10,
+      risk: 12
+    },
+
+    {
+      text: "DIVERSIFY THE CONTRACT",
+      outcome:
+        "You distribute volumes across providers, reducing dependency while controlling some of the additional cost.",
+      people: 5,
+      speed: 3,
+      cost: -4,
+      risk: 10
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 22",
+  title: "WHERE IS TRUCK 27?",
+  scenario:
+    "Your tracking system shows a shipment as DELIVERED. The receiving team says it never arrived.",
+
+  choices: [
+
+    {
+      text: "TRUST THE SYSTEM",
+      outcome:
+        "Operations continue without delay, but an unresolved discrepancy remains in the supply chain.",
+      people: -10,
+      speed: 6,
+      cost: 5,
+      risk: -12
+    },
+
+    {
+      text: "STOP AND INVESTIGATE",
+      outcome:
+        "You prioritize accountability and verification, but related operations slow considerably.",
+      people: -2,
+      speed: -10,
+      cost: -4,
+      risk: 12
+    },
+
+    {
+      text: "VERIFY WHILE OPERATIONS CONTINUE",
+      outcome:
+        "You reconcile transporter and receiving records while allowing unrelated movements to continue.",
+      people: 7,
+      speed: 4,
+      cost: -2,
+      risk: 12
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 25",
+  title: "A DIFFERENT WAY",
+  scenario:
+    "A new logistics solution could reach communities in terrain conventional trucks struggle to access. It has worked elsewhere but has never been tested in this operation.",
+
+  choices: [
+
+    {
+      text: "SCALE IT IMMEDIATELY",
+      outcome:
+        "The solution expands access quickly, but the operation takes substantial implementation risk.",
+      people: 12,
+      speed: 10,
+      cost: -8,
+      risk: -15
+    },
+
+    {
+      text: "STAY WITH THE PROVEN APPROACH",
+      outcome:
+        "The operation remains predictable, but an opportunity to improve access is left unexplored.",
+      people: -4,
+      speed: -4,
+      cost: 4,
+      risk: 7
+    },
+
+    {
+      text: "RUN A CONTROLLED PILOT",
+      outcome:
+        "You test the approach on one corridor with clear success criteria and maintain a fallback option.",
+      people: 7,
+      speed: 2,
+      cost: -5,
+      risk: 12
+    }
+
+  ]
+},
+
+
+{
+  day: "DAY 28 · 72 HOURS",
+  title: "THE FINAL DECISION",
+  scenario:
+    "A severe storm is coming. You have capacity to reach only two locations: NORTH has 80,000 people and 14 days of stocks. EAST has 55,000 people and 2 days of stocks. SOUTH has 120,000 people and 7 days of stocks.",
+
+  choices: [
+
+    {
+      text: "NORTH + SOUTH",
+      outcome:
+        "You maximize the population covered, but East enters the storm with critically low food stocks.",
+      people: 8,
+      speed: 4,
+      cost: 6,
+      risk: -10
+    },
+
+    {
+      text: "EAST + SOUTH",
+      outcome:
+        "You prioritize the population facing the most immediate shortage while still reaching the largest location.",
+      people: 15,
+      speed: 8,
+      cost: -3,
+      risk: 4
+    },
+
+    {
+      text: "NORTH + EAST",
+      outcome:
+        "You protect two strategically vulnerable locations, but the largest population centre must wait.",
+      people: 9,
+      speed: 6,
+      cost: -5,
+      risk: 10
+    }
+
+  ]
+}
+
+];
+
+
+function startGame() {
+
+  document.getElementById("intro").classList.add("hidden");
+  document.getElementById("gameScreen").classList.remove("hidden");
+
+  loadQuestion();
+}
+
+
+function loadQuestion() {
+
+  const q = questions[currentQuestion];
+
+  document.getElementById("progress").textContent =
+    `DECISION ${currentQuestion + 1} / ${questions.length}`;
+
+  document.getElementById("day").textContent = q.day;
+  document.getElementById("questionTitle").textContent = q.title;
+  document.getElementById("scenario").textContent = q.scenario;
+
+  const choices = document.getElementById("choices");
+
+  choices.innerHTML = "";
+
+  q.choices.forEach((choice, index) => {
+
+    const button = document.createElement("button");
+
+    button.className = "choice";
+
+    const letter = String.fromCharCode(65 + index);
+
+    button.innerHTML =
+      `<span class="choice-letter">${letter}</span>${choice.text}`;
+
+    button.onclick = () => chooseAnswer(index);
+
+    choices.appendChild(button);
+
+  });
+
+  document.getElementById("outcome").classList.add("hidden");
+
+}
+
+
+function chooseAnswer(index) {
+
+  const q = questions[currentQuestion];
+  const choice = q.choices[index];
+
+  scores.people += choice.people;
+  scores.speed += choice.speed;
+  scores.cost += choice.cost;
+  scores.risk += choice.risk;
+
+  document.querySelectorAll(".choice")
+    .forEach(button => button.disabled = true);
+
+  document.getElementById("outcomeTitle").textContent =
+    choice.text;
+
+  document.getElementById("outcomeText").textContent =
+    choice.outcome;
+
+
+  const impacts = [
+    ["❤️ Reach", choice.people],
+    ["⚡ Speed", choice.speed],
+    ["💰 Efficiency", choice.cost],
+    ["🛡️ Resilience", choice.risk]
+  ];
+
+  const changes = document.getElementById("changes");
+
+  changes.innerHTML = "";
+
+  impacts.forEach(([name, value]) => {
+
+    const box = document.createElement("div");
+
+    box.className = "change";
+
+    const direction = value >= 0 ? "↑" : "↓";
+    const cssClass = value >= 0 ? "up" : "down";
+
+    box.innerHTML =
+      `${name}<br><strong class="${cssClass}">${direction}</strong>`;
+
+    changes.appendChild(box);
+
+  });
+
+
+  updateScores();
+
+  document.getElementById("outcome").classList.remove("hidden");
+
+}
+
+
+function updateScores() {
+
+  document.getElementById("peopleScore").textContent =
+    scores.people;
+
+  document.getElementById("speedScore").textContent =
+    scores.speed;
+
+  document.getElementById("costScore").textContent =
+    scores.cost;
+
+  document.getElementById("riskScore").textContent =
+    scores.risk;
+
+}
+
+
+function nextQuestion() {
+
+  currentQuestion++;
+
+  if (currentQuestion >= questions.length) {
+    showResults();
+    return;
+  }
+
+  loadQuestion();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+function showResults() {
+
+  document.getElementById("gameScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+
+  document.getElementById("finalPeople").textContent = scores.people;
+  document.getElementById("finalSpeed").textContent = scores.speed;
+  document.getElementById("finalCost").textContent = scores.cost;
+  document.getElementById("finalRisk").textContent = scores.risk;
+
+
+  const values = Object.values(scores);
+
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+
+  let title;
+  let text;
+
+
+  if (max - min <= 20 && min >= 55) {
+
+    title = "THE FIELD LOGISTICIAN";
+
+    text =
+      "You didn't optimize for one thing. You balanced them. You moved assistance, protected scarce resources, adapted when conditions changed and built an operation that could keep going.";
+
+  }
+
+  else {
+
+    const strongest =
+      Object.keys(scores).reduce((a, b) =>
+        scores[a] > scores[b] ? a : b
+      );
+
+
+    if (strongest === "people") {
+
+      title = "THE HUMANITARIAN";
+
+      text =
+        "Again and again, you prioritized getting assistance closer to the people who needed it, even when doing so required additional cost and complexity.";
+
+    }
+
+    else if (strongest === "speed") {
+
+      title = "THE RAPID RESPONDER";
+
+      text =
+        "When conditions changed, you moved. Your instinct was to keep assistance flowing and prevent operational delays.";
+
+    }
+
+    else if (strongest === "cost") {
+
+      title = "THE OPTIMIZER";
+
+      text =
+        "You protected scarce resources and constantly searched for ways to make the operation more efficient.";
+
+    }
+
+    else {
+
+      title = "THE SYSTEMS THINKER";
+
+      text =
+        "You consistently thought beyond today's delivery. You built resilience, managed uncertainty and protected the operation against disruption.";
+
+    }
+
+  }
+
+
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultText").textContent = text;
+
+}
+
+
+function restartGame() {
+
+  currentQuestion = 0;
+
+  scores = {
+    people: 50,
+    speed: 50,
+    cost: 50,
+    risk: 50
+  };
+
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("intro").classList.remove("hidden");
+
+  updateScores();
+
+}
+
+</script>
+
+</body>
+</html>
